@@ -16,7 +16,8 @@ def sair(conexao):
 def dados_recebidos(conexao, dados):
     if dados == b'':
         return sair(conexao)
-    
+    #chamada do tratamento do caso 2
+    dados = data_treatment(conexao, dados)
     comando = dados.split(b' ', 1)[0] # recebe a primeira palavra da conexao
     
     if comando == b'PING':
@@ -35,7 +36,25 @@ def itsPing (conexao, dados):
 def conexao_aceita(conexao):
     print(conexao, 'nova conexão')
     conexao.registrar_recebedor(dados_recebidos)
+    
+    conexao.dados_residuais = b' '
 
+# TRATAMENTO DO CASO 2
+def data_treatment(conexao, dados):
+
+
+	if b'\n' in dados:
+		dados = dados.split(b"\n", 1)
+		conexao.dados_residuais = dados[1]
+		return dados[0] + b'\n'
+	elif b'\n' in dados and conexao.dados_residuais != b'':
+		dados = conexao.dados_residuais + dados
+		conexao.dados_residuais = b''
+		return dados
+	elif b'\n' not in dados and conexao.dados_residuais != b'':
+		conexao.dados_residuais = conexao.dados_residuais + dados
+		return b''
+# FIM DO CASO 2	
 
 servidor = Servidor(6667)
 servidor.registrar_monitor_de_conexoes_aceitas(conexao_aceita)
