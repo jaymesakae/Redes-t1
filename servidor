@@ -17,14 +17,20 @@ def dados_recebidos(conexao, dados):
     if dados == b'':
         return sair(conexao)
     
-    itsPing = dados.split(b' ', 1)[0] # recebe a primeira palavra da conexao
-    if itsPing == b'PING':
-        resposta= b':server PONG server :'
-        resposta+= dados.split(b' ', 1)[1] # resposta recebe resposta padrão + payload
-        conexao.enviar(resposta)
+    comando = dados.split(b' ', 1)[0] # recebe a primeira palavra da conexao
+    
+    if comando == b'PING':
+        itsPing(conexao, dados)
+
         
     print(conexao, dados)
-
+    
+# TRATAMENTO DO CASO 1
+def itsPing (conexao, dados):
+    
+    resposta= b':server PONG server :'
+    resposta+= dados.split(b' ', 1)[1] # resposta recebe resposta padrão + payload
+    conexao.enviar(resposta)
 
 def conexao_aceita(conexao):
     print(conexao, 'nova conexão')
