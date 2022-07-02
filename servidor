@@ -69,7 +69,36 @@ def data_treatment(conexao, dados):
 	return dados
 		
 # FIM DO CASO 2	
+# TRATAMENTO CASO 3 E 4                 
+def itsNick (conexao, dados):
+    apelido = dados.split(b' ', 1)[1] # extraindo o apelido após o comando
+    apelido = apelido.split(b'\n\r')[0] # removendo os caracteres de quebra de linha
+    novo_apelido = b'*
+    apelido = apelido.lower()
+    
+                 
+                
+    # apelido ja existe
+    if apelido in Nicks:
+        resposta = b':server 433 ' + conexao.apelido + b' ' + apelido + b' :Nickname is already in use' + b'\n\r'
 
+    
+    # validando apelido 
+    if validar_nome(apelido):
+        # primeiro apelido
+        if conexao_apelido == novo_apelido:
+            Nicks[apelido] = conexao  # coloca no dicionário a chave apelido com conexao de conteudo
+            conexao.apelido = apelido
+            conexao.enviar(b':server 422 ' + apelido + b' :MOTD File is missing' + b'\n\r'
+        # trocar apelido
+        else:
+            Nicks[apelido] = Nicks.pop(apelido)
+            
+                          
+   # apelido invalido          
+    else: 
+        conexao.enviar(b':server 432 ' + b'* ' + apelido + b' :Erroneous nickname' + b'\n\r')
+    
 servidor = Servidor(6667)
 servidor.registrar_monitor_de_conexoes_aceitas(conexao_aceita)
 asyncio.get_event_loop().run_forever()
