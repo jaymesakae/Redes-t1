@@ -70,52 +70,47 @@ def data_treatment(conexao, dados):
 			dados[-1] = b''
 	else:
 		conexao.dados_residuais = conexao.dados_residuais + dados
+		dados = []
 	return dados
 		
 # FIM DO CASO 2	
 # TRATAMENTO CASO 3 E 4                 
 def itsNick (conexao, dados):
-	print(dados)
 
 
 	apelido = dados.split(b' ', 1)[1] # extraindo o apelido após o comando
 	apelido = apelido.split(b'\r\n')[0] # removendo os caracteres de quebra de linha
-	apelido = apelido.lower()
-
-
-	if apelido in Nicks and conexao != Nicks[apelido]:
-		resposta = b':server 433 ' + conexao.apelido + b' ' + apelido + b' :Nickname is already in use' + b'\n\r'
-		
-		conexao.enviar (resposta)
-		return 
+	
+	apelido_antigo = b'*'
 
 
 	# validando apelido 
-	if validar_nome(apelido):
+	if validar_nome(apelido):	
+		# confirmar se existe uma conexao ja estabelecida
+		for chave, valor in Nicks.items():
+				if conexao == valor:
+					apelido_antigo = chave
+					
+		# se o apelido ja tiver nos nicks e nao tem o mesmo valor de conexao
+		if apelido.lower() in Nicks and conexao != Nicks[apelido.lower()]:
+			conexao.enviar (b':server 433 ' + apelido_antigo + b' ' + apelido + b' :Nickname is already in use\r\n')
+			return 
+	
 		# trocar apelido
 		if conexao in Nicks.values():
-			#apelido_antigo = Nicks[]
-			PRINT("\n\nENTROU NO IF\n\n")
-			#isso aqui n funciona
-			# rode, por exemplo
-			# a = {'A': 123}
-			# a['A'] = a.pop('A')
-			Nicks[apelido] = Nicks.pop(apelido)
+			
+			Nicks[apelido.lower] = Nicks.pop(apelido_antigo)
+			conexao.enviar(b':' + apelido_antigo + b' NICK ' + apelido + b'\r\n')
 		# primeiro apelido
 		else:
 			conexao.enviar(b':server 001 ' + apelido + b' :Welcome\r\n')
 			conexao.enviar(b':server 422 ' + apelido + b' :MOTD File is missing\r\n')	
-			Nicks[apelido] = conexao  # coloca no dicionário a chave apelido com conexao de conteud
-			print("\n\n ELSE1\n\n")
-					
-
+			Nicks[apelido.lower()] = conexao  # coloca no dicionário a chave apelido com conexao de conteud
 
 	  
 	# apelido invalido          
 	else: 
-		print("\n\nELSE FINAL", apelido, "\n\n")
-		print(b':server 432 * ' + apelido + b' :Erroneous nickname' + b'\n\r')
-		conexao.enviar(b':server 432 * '+ apelido + b' :Erroneous nickname\r\n')
+		conexao.enviar(b':server 432 ' + apelido_antigo + b' '+ apelido + b' :Erroneous nickname\r\n')
 
 servidor = Servidor(6667)
 servidor.registrar_monitor_de_conexoes_aceitas(conexao_aceita)
