@@ -15,7 +15,7 @@ def sair(conexao):
 
 def dados_recebidos(conexao, dados):
 	if dados == b'':
-		return sair(conexao)
+		return sair(conexao)PRIVMSG'
 	#chamada do tratamento do caso 2
 	dados = data_treatment(conexao, dados)
 	# recebe todos os elementos de dados menos o ultimo (vazio)
@@ -25,7 +25,7 @@ def dados_recebidos(conexao, dados):
 
 		if comando == b'PING':
 			itsPing(conexao, dado)
-
+		if comando == b'PRIVMSG'
 
 	print(conexao, dados)
 
