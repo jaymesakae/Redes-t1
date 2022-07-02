@@ -25,7 +25,8 @@ def dados_recebidos(conexao, dados):
 
 		if comando == b'PING':
 			itsPing(conexao, dado)
-		if comando == b'PRIVMSG'
+		if comando == b'NICK'
+			itsNick(conexao, dados)
 
 	print(conexao, dados)
 
