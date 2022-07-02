@@ -53,6 +53,8 @@ def data_treatment(conexao, dados):
 	
 	normalmente, para a finalização dos dados, entende-se de que o ultimo elemento da lista 
 	dados seja o b'' para sair dessa funçao
+	
+	retorna uma lista
 	"""
 	
 	if conexao.dados_residuais != b'':
@@ -73,38 +75,48 @@ def data_treatment(conexao, dados):
 # FIM DO CASO 2	
 # TRATAMENTO CASO 3 E 4                 
 def itsNick (conexao, dados):
-	
-    apelido = dados.split(b' ', 1)[1] # extraindo o apelido após o comando
-    apelido = apelido.split(b'\r\n')[0] # removendo os caracteres de quebra de linha
-    novo_apelido = b'*'
-    apelido = apelido.lower()
-    
-                 
-                
-    # apelido ja existe
-    if apelido in Nicks:
-        resposta = b':server 433 ' + conexao.apelido + b' ' + apelido + b' :Nickname is already in use' + b'\n\r'
-	conexao.enviar (resposta)
-	return 
+	print(dados)
 
-    
-    # validando apelido 
-    if validar_nome(apelido):
-        # primeiro apelido
-        if conexao in Nicks.values():
-	    Nicks[apelido] = Nicks.pop(apelido)
-        # trocar apelido
-        else:
-	    Nicks[apelido] = conexao  # coloca no dicionário a chave apelido com conexao de conteud
-	    conexao.apelido = apelido
-	    conexao.enviar(b':server 422 ' + apelido + b' :MOTD File is missing' + b'\n\r')
 
-            
-                          
-   # apelido invalido          
-    else: 
-        conexao.enviar(b':server 432 ' + b'* ' + apelido + b' :Erroneous nickname' + b'\n\r')
-    
+	apelido = dados.split(b' ', 1)[1] # extraindo o apelido após o comando
+	apelido = apelido.split(b'\r\n')[0] # removendo os caracteres de quebra de linha
+	apelido = apelido.lower()
+
+
+	if apelido in Nicks and conexao != Nicks[apelido]:
+		resposta = b':server 433 ' + conexao.apelido + b' ' + apelido + b' :Nickname is already in use' + b'\n\r'
+		
+		conexao.enviar (resposta)
+		return 
+
+
+	# validando apelido 
+	if validar_nome(apelido):
+		# trocar apelido
+		if conexao in Nicks.values():
+			#apelido_antigo = Nicks[]
+			PRINT("\n\nENTROU NO IF\n\n")
+			#isso aqui n funciona
+			# rode, por exemplo
+			# a = {'A': 123}
+			# a['A'] = a.pop('A')
+			Nicks[apelido] = Nicks.pop(apelido)
+		# primeiro apelido
+		else:
+			conexao.enviar(b':server 001 ' + apelido + b' :Welcome\r\n')
+			conexao.enviar(b':server 422 ' + apelido + b' :MOTD File is missing\r\n')	
+			Nicks[apelido] = conexao  # coloca no dicionário a chave apelido com conexao de conteud
+			print("\n\n ELSE1\n\n")
+					
+
+
+	  
+	# apelido invalido          
+	else: 
+		print("\n\nELSE FINAL", apelido, "\n\n")
+		print(b':server 432 * ' + apelido + b' :Erroneous nickname' + b'\n\r')
+		conexao.enviar(b':server 432 * '+ apelido + b' :Erroneous nickname\r\n')
+
 servidor = Servidor(6667)
 servidor.registrar_monitor_de_conexoes_aceitas(conexao_aceita)
 asyncio.get_event_loop().run_forever()
