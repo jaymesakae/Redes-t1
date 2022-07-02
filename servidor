@@ -84,18 +84,21 @@ def itsNick (conexao, dados):
     # apelido ja existe
     if apelido in Nicks:
         resposta = b':server 433 ' + conexao.apelido + b' ' + apelido + b' :Nickname is already in use' + b'\n\r'
+	conexao.enviar (resposta)
+	return 
 
     
     # validando apelido 
     if validar_nome(apelido):
         # primeiro apelido
-        if conexao.apelido == novo_apelido:
-            Nicks[apelido] = conexao  # coloca no dicionário a chave apelido com conexao de conteudo
-            conexao.apelido = apelido
-            conexao.enviar(b':server 422 ' + apelido + b' :MOTD File is missing' + b'\n\r')
+        if conexao in Nicks.values():
+	    Nicks[apelido] = Nicks.pop(apelido)
         # trocar apelido
         else:
-            Nicks[apelido] = Nicks.pop(apelido)
+	    Nicks[apelido] = conexao  # coloca no dicionário a chave apelido com conexao de conteud
+	    conexao.apelido = apelido
+	    conexao.enviar(b':server 422 ' + apelido + b' :MOTD File is missing' + b'\n\r')
+
             
                           
    # apelido invalido          
