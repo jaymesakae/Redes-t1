@@ -111,7 +111,7 @@ def itsNick (conexao, dados):
 		# troca de apelido
 		if apelido_antigo != b'*':
 			apelido_antigo = conexao.apelido
-			del Nicks[apelido_antigo]
+			del Nicks[apelido_antigo.lower()]
 			print("else")
 			print(b':' , apelido_antigo , b' NICK ' , apelido , b'\r\n')
 			conexao.enviar(b':' + apelido_antigo + b' NICK ' + apelido + b'\r\n')
