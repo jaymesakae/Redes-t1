@@ -96,9 +96,8 @@ def itsNick (conexao, dados):
 
 
 	apelido = dados.split(b' ', 1)[1] # extraindo o apelido após o comando
-	apelido = apelido.split(b'\r\n')[0] # removendo os caracteres de quebra de linha
-	apelido_antigo = encontra_usuario(conexao)	
-
+	apelido = apelido.split(b'\r\n')[0] # removendo os caracteres de quebra de linha	
+	apelido_antigo = encontra_usuario(conexao)
 
 	# validando apelido 
 	if validar_nome(apelido):
@@ -106,11 +105,12 @@ def itsNick (conexao, dados):
 		if apelido.lower() in Nicks:
 			conexao.enviar (b':server 433 ' + apelido_antigo + b' ' + apelido + b' :Nickname is already in use\r\n')
 			return 
-			
-		Nicks[apelido.lower()] = conexao
 		
+		conexao.apelido = apelido	
+		Nicks[apelido.lower()] = conexao
 		# troca de apelido
 		if apelido_antigo != b'*':
+			apelido_antigo = conexao.apelido
 			del Nicks[apelido_antigo]
 			print("else")
 			print(b':' , apelido_antigo , b' NICK ' , apelido , b'\r\n')
