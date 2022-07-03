@@ -97,31 +97,31 @@ def itsNick (conexao, dados):
 
 	apelido = dados.split(b' ', 1)[1] # extraindo o apelido após o comando
 	apelido = apelido.split(b'\r\n')[0] # removendo os caracteres de quebra de linha
-	
-	apelido_antigo = b'*'
+	apelido_antigo = encontra_usuario(conexao)	
 
 
 	# validando apelido 
-	if validar_nome(apelido):	
-		apelido_antigo = encontra_usuario(conexao)
-		
+	if validar_nome(apelido):
 		# se o apelido ja tiver nos nicks e nao tem o mesmo valor de conexao
-		if apelido.lower() in Nicks and conexao != Nicks[apelido.lower()]:
+		if apelido.lower() in Nicks:
 			conexao.enviar (b':server 433 ' + apelido_antigo + b' ' + apelido + b' :Nickname is already in use\r\n')
 			return 
-	
-		# trocar apelido
-		if conexao in Nicks.values():
-			Nicks[apelido.lower] = Nicks.pop(apelido_antigo)
+			
+		Nicks[apelido.lower()] = conexao
+		
+		# troca de apelido
+		if apelido_antigo != b'*':
+			del Nicks[apelido_antigo]
+			print("else")
+			print(b':' , apelido_antigo , b' NICK ' , apelido , b'\r\n')
 			conexao.enviar(b':' + apelido_antigo + b' NICK ' + apelido + b'\r\n')
-			print("\n\naqui\n\n")
-			return
+		
 		
 		# primeiro apelido
 		else:
 			conexao.enviar(b':server 001 ' + apelido + b' :Welcome\r\n')
-			conexao.enviar(b':server 422 ' + apelido + b' :MOTD File is missing\r\n')	
-			Nicks[apelido.lower()] = conexao  # coloca no dicionário a chave apelido com conexao de conteud
+			conexao.enviar(b':server 422 ' + apelido + b' :MOTD File is missing\r\n')
+		return	
 
 	  
 	# apelido invalido          
@@ -137,6 +137,7 @@ def privatemsg(remetente, destinatario, mensagem):
 	
 	# primeira etapa
 	if Nicks[destinatario.lower()] and remetente != b'*':
+		print("mandou\n\n")
 		Nicks[destinatario.lower()].enviar(b':' + remetente + b' PRIVMSG ' + destinatario + b' :' + mensagem + b'\r\n')
 		
 		
